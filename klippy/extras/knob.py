@@ -1,0 +1,34 @@
+
+# Welding Control system
+#
+# Copyright (C) 2024  Dmitrij Viskunov <viskunovdmitrij1@gmail.com>
+
+import logging
+import socket
+
+
+class KnobSlave:
+    def __init__(self, config):
+        self.printer = config.get_printer()
+        self.reactor = self.printer.get_reactor()
+        
+        self.gcode_move = self.printer.lookup_object("gcode_move")
+        self.gcode = self.printer.lookup_object("gcode")
+        self.server = self.printer.lookup_object("webhooks")
+        self.server.register_endpoint("knob/change_param", self.change_param)
+
+    def change_param(self, webrequest):
+        name = webrequest.get_str('name')
+        value = webrequest.get_str('value')
+        if name == "extruder_speed":
+            self.gcode.run_script_from_command(f'M220 S{value}')
+    def get_status(self, eventtime):
+        return {'extruder_speed': self.gcode_move.extrude_factor * 100}
+
+
+
+
+
+
+def load_config(config):
+    return KnobSlave(config)
