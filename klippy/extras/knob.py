@@ -8,62 +8,62 @@ import threading
 import serial.tools.list_ports
 import serial
 
-class Connection(object):
-    ToGetData = ""
-    ToSendData = ""
-    AvaliablePorts = []
-    Baudrate = 9600
-    __Device = serial.Serial()
-    def Avaliable(self):
-        try:
-            return self.__Device.in_waiting
-        except Exception as e:
-            return 0
-    def CheckOut(self):
-        self.AvaliablePorts.clear()
-        for port in serial.tools.list_ports.comports():
-                if port.pid != None:
-                    self.AvaliablePorts.append((port.name, port.description))
-    def ConnectTo(self, Port:str):
-        if(len(self.AvaliablePorts) == 0):
-            return 0
-        try:
-            if(self.__Device.is_open):
-                self.__Device.close()
-            self.__Device.baudrate = self.Baudrate
-            self.__Device.port = Port
-            self.__Device.open()
-        except Exception as e:
-            return 0
-        return 1
-    def Disconnect(self):
-        try:
-            self.__Device.close()
-        except Exception as e:
-            return 0
-        return 1
-    def GetData(self):
-        try:
-            if(self.__Device.in_waiting):
-                self.ToGetData = (self.__Device.read_all().decode('utf-8').rstrip())
-        except Exception as e:
-            return 0
-        return 1
-    def SendData(self):
-        try:
-            self.ToSendData = str(self.ToSendData)
-            self.__Device.write(self.ToSendData.encode())
-        except Exception as e:
-            return 0
-        return 1
+# class Connection(object):
+    # ToGetData = ""
+    # ToSendData = ""
+    # AvaliablePorts = []
+    # Baudrate = 9600
+    # __Device = serial.Serial()
+    # def Avaliable(self):
+    #     try:
+    #         return self.__Device.in_waiting
+    #     except Exception as e:
+    #         return 0
+    # def CheckOut(self):
+    #     self.AvaliablePorts.clear()
+    #     for port in serial.tools.list_ports.comports():
+    #             if port.pid != None:
+    #                 self.AvaliablePorts.append((port.name, port.description))
+    # def ConnectTo(self, Port:str):
+    #     if(len(self.AvaliablePorts) == 0):
+    #         return 0
+    #     try:
+    #         if(self.__Device.is_open):
+    #             self.__Device.close()
+    #         self.__Device.baudrate = self.Baudrate
+    #         self.__Device.port = Port
+    #         self.__Device.open()
+    #     except Exception as e:
+    #         return 0
+    #     return 1
+    # def Disconnect(self):
+    #     try:
+    #         self.__Device.close()
+    #     except Exception as e:
+    #         return 0
+    #     return 1
+    # def GetData(self):
+    #     try:
+    #         if(self.__Device.in_waiting):
+    #             self.ToGetData = (self.__Device.read_all().decode('utf-8').rstrip())
+    #     except Exception as e:
+    #         return 0
+    #     return 1
+    # def SendData(self):
+    #     try:
+    #         self.ToSendData = str(self.ToSendData)
+    #         self.__Device.write(self.ToSendData.encode())
+    #     except Exception as e:
+    #         return 0
+    #     return 1
 
 REPORT_TIME = 1.0
 
 
 class KnobSlave:
     def __init__(self, config):
-        self.Serial = Connection()
-        self.Serial.Baudrate = 115200
+        # self.Serial = Connection()
+        # self.Serial.Baudrate = 115200
         self.printer = config.get_printer()
         self.reactor = self.printer.get_reactor()
         self.gcode_move = self.printer.lookup_object("gcode_move")
@@ -87,15 +87,15 @@ class KnobSlave:
     
     def update(self):
         self.not_working = False
-        self.Serial.CheckOut()
-        if not self.Serial.AvaliablePorts:
-            return
-        logging.info(f'Connection: {self.Serial.ConnectTo(self.Serial.AvaliablePorts[0][0])}')
-        while True:
-            if self.Serial.GetData():
-                logging.info(f'GET: {self.Serial.ToGetData}')
-            else:
-                break
+        # self.Serial.CheckOut()
+        # if not self.Serial.AvaliablePorts:
+        #     return
+        # logging.info(f'Connection: {self.Serial.ConnectTo(self.Serial.AvaliablePorts[0][0])}')
+        # while True:
+        #     if self.Serial.GetData():
+        #         logging.info(f'GET: {self.Serial.ToGetData}')
+        #     else:
+        #         break
         self.not_working = True
     
     def poll_serial(self, eventtime):
