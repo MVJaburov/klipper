@@ -4,16 +4,17 @@
 # Copyright (C) 2024  Dmitrij Viskunov <viskunovdmitrij1@gmail.com>
 
 import logging
-import socket
+from PySerial import Connection
 import threading
 REPORT_TIME = 1.0
 
 
 class KnobSlave:
     def __init__(self, config):
+        self.Serial = Connection()
+        self.Serial.Baudrate = 115200
         self.printer = config.get_printer()
         self.reactor = self.printer.get_reactor()
-        self.i = 0
         self.gcode_move = self.printer.lookup_object("gcode_move")
         self.gcode = self.printer.lookup_object("gcode")
         self.server = self.printer.lookup_object("webhooks")
@@ -35,9 +36,15 @@ class KnobSlave:
     
     def update(self):
         self.not_working = False
-        self.i += 1
-        logging.info(f'CUR: {self.i}')
-        print(f'CUR: {self.i}')
+        self.Serial.CheckOut()
+        if not self.Serial.AvaliablePorts:
+            return
+        logging.info(f'Connection: {self.Serial.ConnectTo(self.Serial.AvaliablePorts[0][0])}')
+        while True:
+            if self.Serial.GetData():
+                logging.info(f'GET: {self.Serial.ToGetData}')
+            else:
+                break
         self.not_working = True
     
     def poll_serial(self, eventtime):
